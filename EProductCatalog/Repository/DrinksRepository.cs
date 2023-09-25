@@ -2,6 +2,7 @@
 using EProductCatalog.Models;
 using EProductCatalog.Models.Dto;
 using EProductCatalog.Repository.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace EProductCatalog.Repository
@@ -14,24 +15,43 @@ namespace EProductCatalog.Repository
             _appContext = appContext;
         }
 
-        public Task<bool> Delete(int id)
+        public async Task<bool> Delete(int id)
         {
-            throw new NotImplementedException();
+            Drinks? drink = await _appContext.Drinks.FirstOrDefaultAsync(x => x.Id == id && x.Status);
+            if (drink == null) return false;
+            drink.Status = false;
+            await _appContext.SaveChangesAsync();
+            return true;
         }
 
-        public Task<Pages<Drinks>> GetAll(int? offset, int? limit)
+        public async Task<Pages<Drinks>> GetAll(int? offset, int? limit)
         {
-            throw new NotImplementedException();
+            IQueryable<Drinks> query = _appContext.Drinks.Where(x => x.Status);
+            List<Drinks> drinks = await query.OrderBy(x => x.Id).Skip(offset ?? 0).Take(limit ?? 10).ToListAsync();
+            int totalItems = await query.CountAsync();
+            return new Pages<Drinks>()
+            {
+                TotalItems = totalItems,
+                Elements = drinks
+            };
         }
 
-        public Task<Pages<Drinks>> GetAllBy(Expression<Func<Drinks, bool>> predicate, int? offset, int? limit)
+        public async Task<Pages<Drinks>> GetAllBy(Expression<Func<Drinks, bool>> predicate, int? offset, int? limit)
         {
-            throw new NotImplementedException();
+            IQueryable<Drinks> query = _appContext.Drinks.Where(predicate);
+            List<Drinks> drinks = await query.OrderBy(x => x.Id).Skip(offset ?? 0).Take(limit ?? 0).ToListAsync();
+            int totalItems = await query.CountAsync();
+            return new Pages<Drinks>()
+            {
+                TotalItems = totalItems,
+                Elements = drinks
+            };
         }
 
-        public Task<Drinks?> GetOneBy(Expression<Func<Drinks, bool>> predicate)
+        public async Task<Drinks?> GetOneBy(Expression<Func<Drinks, bool>> predicate)
         {
-            throw new NotImplementedException();
+            Drinks? drink = await _appContext.Drinks.FirstOrDefaultAsync(predicate);
+            return drink;
         }
 
         public Task<Drinks?> GetOneById(int id)

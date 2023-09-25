@@ -15,7 +15,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-string? conectionString = builder.Configuration["ConnectionStrings:Dev"];
+string? conectionString = builder.Configuration["ConnectionStrings:Dev2"];
 
 if (conectionString == null)
     throw new Exception("Connection string not found");

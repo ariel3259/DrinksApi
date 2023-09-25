@@ -13,5 +13,6 @@ namespace EProductCatalog.Models
         public int DrinkTypeId { get; set; }
 
         public virtual DrinkTypes? DrinkType { get; set; }
+
     }
 }
